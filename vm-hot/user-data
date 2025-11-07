@@ -27,7 +27,7 @@ write_files:
           --name rest_server \
           -e "OPTIONS=--no-auth --private-repos" \
           -p 8000:8000 \
-          -v {{ mnt_rest_server }}:/data:Z \
+          -v {{ ds.meta_data.mnt_rest_server }}:/data:Z \
           docker.io/restic/rest-server
 
       ExecStop=/usr/bin/podman stop -t 10 rest_server
@@ -42,19 +42,19 @@ runcmd:
   - bash /root/mkfs_all.sh
 
   # Create mount point
-  - mkdir -p {{ mnt_rest_server }}
+  - mkdir -p {{ ds.meta_data.mnt_rest_server }}
 
   # Mount /dev/vdb into /mnt/rest-server
-  - mount {{ dev_rest_server }} {{ mnt_rest_server }}
+  - mount {{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }}
 
   # Add entries to /etc/fstab
   - |
-    grep -q '{{ mnt_rest_server }}' /etc/fstab || echo '{{ dev_rest_server }} {{ mnt_rest_server }} xfs defaults 0 0' >> /etc/fstab
+    grep -q '{{ ds.meta_data.mnt_rest_server }}' /etc/fstab || echo '{{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }} xfs defaults 0 0' >> /etc/fstab
 
   # ---- USER TASKS ----
   # Ensure /mnt/rest-server ownership & SELinux context
-  - chown -R kikitux:kikitux {{ mnt_rest_server }}
-  - chcon -Rt container_file_t {{ mnt_rest_server }}
+  - chown -R kikitux:kikitux {{ ds.meta_data.mnt_rest_server }}
+  - chcon -Rt container_file_t {{ ds.meta_data.mnt_rest_server }}
 
   # Enable linger for user services (so they start at boot)
   - loginctl enable-linger kikitux
