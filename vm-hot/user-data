@@ -1,11 +1,8 @@
 ## template: jinja
 #cloud-config
 
-users:
-  - name: kikitux
-    shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
-    lock_passwd: false
+#include
+https://raw.githubusercontent.com/kikitux/cloud-init/refs/heads/main/common/user-data
 
 write_files:
   - path: /home/kikitux/.config/systemd/user/rest-server.service
