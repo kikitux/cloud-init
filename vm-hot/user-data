@@ -1,0 +1,66 @@
+#cloud-config
+users:
+  - name: kikitux
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+write_files:
+  - path: /home/kikitux/.config/systemd/user/rest-server.service
+    owner: kikitux:kikitux
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Restic rest-server (Podman, rootless)
+      After=network.target
+      Wants=network-online.target
+
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=5s
+
+      ExecStart=/usr/bin/podman run \
+          --rm \
+          --name rest_server \
+          -e "OPTIONS=--no-auth --private-repos" \
+          -p 8000:8000 \
+          -v /mnt/rest-server:/data:Z \
+          docker.io/restic/rest-server
+
+      ExecStop=/usr/bin/podman stop -t 10 rest_server
+      ExecStopPost=/usr/bin/podman rm -f rest_server
+
+      [Install]
+      WantedBy=default.target
+
+runcmd:
+  # ---- ROOT TASKS ----
+  # Run mkfs_all.sh as root
+  - /root/mkfs_all.sh
+
+  # Create mount point
+  - mkdir -p /mnt/rest-server
+
+  # Mount /dev/vdb into /mnt/rest-server
+  - mount /dev/vdb /mnt/rest-server
+
+  # Add entries to /etc/fstab
+  - |
+    grep -q '/mnt/rest-server' /etc/fstab || echo '/dev/vdb /mnt/rest-server xfs defaults 0 0' >> /etc/fstab
+  - |
+    grep -q '/mnt/md1' /etc/fstab || echo '/dev/md1 /mnt/md1 xfs noatime,nodiratime,logbufs=8,logbsize=256k,allocsize=1m 0 0' >> /etc/fstab
+
+  # ---- USER TASKS ----
+  # Ensure /mnt/rest-server ownership & SELinux context
+  - chown -R kikitux:kikitux /mnt/rest-server
+  - chcon -Rt container_file_t /mnt/rest-server
+
+  # Enable linger for user services (so they start at boot)
+  - loginctl enable-linger kikitux
+
+  # Reload and start systemd user service
+  - sudo -u kikitux systemctl --user daemon-reload
+  - sudo -u kikitux systemctl --user enable --now rest-server
+
+final_message: "Disk setup and rest-server deployed successfully for user kikitux."
