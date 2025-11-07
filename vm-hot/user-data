@@ -44,8 +44,8 @@ runcmd:
   # Create mount point
   - mkdir -p {{ ds.meta_data.mnt_rest_server }}
 
-  # Mount /dev/vdb into /mnt/rest-server
-  - mount {{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }}
+  # Mount /dev into /mnt
+  - mountpoint {{ ds.meta_data.mnt_rest_server }} || mount {{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }}
 
   # Add entries to /etc/fstab
   - |
