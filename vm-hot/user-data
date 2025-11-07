@@ -64,7 +64,3 @@ runcmd:
   - sudo -u kikitux systemctl --user enable --now rest-server
 
 final_message: "Disk setup and rest-server deployed successfully for user kikitux."
-
-
-
-final_message: "Disk setup and rest-server deployed successfully for user kikitux."
