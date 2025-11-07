@@ -1,4 +1,4 @@
 instance-id: vm-hot
 local-hostname: vm-hot
-dev_rest_server: /dev/vdb
-mnt_rest_server: /mnt/rest-server
+dev-rest-server: /dev/vdb
+mnt-rest-server: /mnt/rest-server
