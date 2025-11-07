@@ -1,0 +1,13 @@
+#cloud-config
+users:
+  - name: kikitux
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+runcmd:
+  # ---- ROOT TASKS ----
+  # Run mkfs_all.sh as root
+  - /root/mkfs_all.sh
+
+final_message: "User kikitux and disk setup deployed successfully."
