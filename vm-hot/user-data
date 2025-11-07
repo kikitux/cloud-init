@@ -60,7 +60,7 @@ runcmd:
   - loginctl enable-linger kikitux
 
   # Reload and start systemd user service
-  - sudo -u kikitux systemctl --user daemon-reload
-  - sudo -u kikitux systemctl --user enable --now rest-server
+  - sudo runuser kikitux -l -c "systemctl --user daemon-reload"
+  - sudo runuser kikitux -l -c "systemctl --user enable --now rest-server"
 
 final_message: "Disk setup and rest-server deployed successfully for user kikitux."
