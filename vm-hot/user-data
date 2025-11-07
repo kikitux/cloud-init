@@ -1,7 +1,14 @@
 #cloud-config
 
-includes:
-  - https://raw.githubusercontent.com/kikitux/cloud-init/main/common/user-data
-  - https://raw.githubusercontent.com/kikitux/cloud-init/main/rest-server/user-data
+users:
+  - name: kikitux
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+runcmd:
+  # ---- ROOT TASKS ----
+  # Run mkfs_all.sh as root
+  - /root/mkfs_all.sh
 
 final_message: "Disk setup and rest-server deployed successfully for user kikitux."
