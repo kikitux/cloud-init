@@ -1,7 +1,7 @@
 #cloud-config
 
-#includes:
-#  - https://raw.githubusercontent.com/kikitux/cloud-init/main/common/user-data
-#  - https://raw.githubusercontent.com/kikitux/cloud-init/main/rest-server/user-data
+includes:
+  - https://raw.githubusercontent.com/kikitux/cloud-init/main/common/user-data
+  - https://raw.githubusercontent.com/kikitux/cloud-init/main/rest-server/user-data
 
 final_message: "Disk setup and rest-server deployed successfully for user kikitux."
