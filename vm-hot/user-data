@@ -8,6 +8,14 @@ users:
     lock_passwd: false
 
 write_files:
+  - path: /home/kikitux/.bash_profile
+    owner: kikitux:kikitux
+    permissions: '0644'
+    append: false
+    content: |
+      export XDG_RUNTIME_DIR="/run/user/$UID"
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+
   - path: /home/kikitux/.config/systemd/user/rest-server.service
     owner: kikitux:kikitux
     permissions: '0644'
