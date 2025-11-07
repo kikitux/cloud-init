@@ -39,7 +39,7 @@ write_files:
 runcmd:
   # ---- ROOT TASKS ----
   # Run mkfs_all.sh as root
-  - /root/mkfs_all.sh
+  - bash /root/mkfs_all.sh
 
   # Create mount point
   - mkdir -p {{ mnt_rest_server }}
