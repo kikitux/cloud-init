@@ -66,10 +66,16 @@ runcmd:
 
   # minio
   {% for mnt in ds.meta_data.mnt_minio %}
+  # check all is good
+  - echo {{ mnt }}
+  - echo {{ ds.meta_data.dev_minio[loop.index0] }}
+
   # Create mount point
   - mkdir -p {{ mnt }}
+
   # Mount /dev into /mnt
-  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_rest_server[loop.index0] }} {{ mnt }}
+  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
+
   # Add entries to /etc/fstab
   - |
     grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
