@@ -8,6 +8,7 @@ users:
     lock_passwd: false
 
 write_files:
+  # profile
   - path: /home/kikitux/.bash_profile
     owner: kikitux:kikitux
     permissions: '0644'
@@ -16,6 +17,7 @@ write_files:
       export XDG_RUNTIME_DIR="/run/user/$UID"
       export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 
+  # rest-server service
   - path: /home/kikitux/.config/systemd/user/rest-server.service
     owner: kikitux:kikitux
     permissions: '0644'
@@ -41,6 +43,49 @@ write_files:
       ExecStop=/usr/bin/podman stop -t 10 rest_server
       ExecStopPost=/usr/bin/podman rm -f rest_server
 
+      [Install]
+      WantedBy=default.target
+
+  # minio service
+  - path: /home/kikitux/.config/systemd/user/minio-server.service
+    owner: kikitux:kikitux
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=MinIO Object Storage (Podman, rootless)
+      After=network.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=5s
+      
+      ExecStart=/usr/bin/podman run \
+        --rm \
+        --name minio-server \
+        -p 9000:9000 \
+        -p 9001:9001 \
+        -e MINIO_ROOT_USER=admin \
+        -e MINIO_ROOT_PASSWORD=admin123 \
+        -v /mnt/minio/hot1:/hot1:Z \
+        -v /mnt/minio/hot2:/hot2:Z \
+        -v /mnt/minio/hot3:/hot3:Z \
+        -v /mnt/minio/hot4:/hot4:Z \
+        -v /mnt/minio/hot5:/hot5:Z \
+        -v /mnt/minio/hot6:/hot6:Z \
+        -v /mnt/minio/hot7:/hot7:Z \
+        -v /mnt/minio/hot8:/hot8:Z \
+        -v /mnt/minio/hot9:/hot9:Z \
+        docker.io/minio/minio server \
+          --address :9000 --console-address :9001 \
+          /hot1 /hot2 /hot3 /hot4 \
+          /hot5 /hot6 /hot7 /hot8 \
+          /hot9
+      
+      ExecStop=/usr/bin/podman stop -t 10 minio-server
+      ExecStopPost=/usr/bin/podman rm -f minio-server
+      
       [Install]
       WantedBy=default.target
 
@@ -93,5 +138,6 @@ runcmd:
   # Reload and start systemd user service
   - su -c 'systemctl --user daemon-reload' - kikitux
   - su -c 'systemctl --user enable --now rest-server' - kikitux
+  - su -c 'systemctl --user enable --now minio-server' - kikitux
 
-final_message: "Disk setup and rest-server deployed successfully for user kikitux."
+final_message: "Disk setup, rest-server and minio-server deployed successfully for user kikitux."
