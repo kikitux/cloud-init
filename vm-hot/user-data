@@ -49,6 +49,7 @@ runcmd:
   # Run mkfs_all.sh as root
   - bash /root/mkfs_all.sh
 
+  # rest-server
   # Create mount point
   - mkdir -p {{ ds.meta_data.mnt_rest_server }}
 
@@ -59,10 +60,27 @@ runcmd:
   - |
     grep -q '{{ ds.meta_data.mnt_rest_server }}' /etc/fstab || echo '{{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }} xfs defaults 0 0' >> /etc/fstab
 
-  # ---- USER TASKS ----
   # Ensure /mnt/rest-server ownership & SELinux context
   - chown -R kikitux:kikitux {{ ds.meta_data.mnt_rest_server }}
   - chcon -Rt container_file_t {{ ds.meta_data.mnt_rest_server }}
+
+  # minio
+  {% for mnt in ds.meta_data.mnt_minio %}
+  # Create mount point
+  - mkdir -p {{ mnt }}
+  # Mount /dev into /mnt
+  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_rest_server[loop.index0] }} {{ mnt }}
+  Add entries to /etc/fstab
+  - |
+    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+
+ # Ensure /mnt ownership & SELinux context
+  - chown -R kikitux:kikitux {{ mnt }}
+  - chcon -Rt container_file_t {{ mnt }}
+
+  {% endfor %}
+
+
 
   # Enable linger for user services (so they start at boot)
   - loginctl enable-linger kikitux
