@@ -124,12 +124,11 @@ runcmd:
   # Add entries to /etc/fstab
   - |
     grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+  {% endfor %}
 
   # Ensure /mnt ownership & SELinux context
-  - chown -R kikitux:kikitux {{ mnt }}
-  - chcon -Rt container_file_t {{ mnt }}
-
-  {% endfor %}
+  - sudo chown -R kikitux:kikitux /mnt/minio
+  - sudo chcon -Rt container_file_t /mnt/minio
 
   # Enable linger for user services (so they start at boot)
   - loginctl enable-linger kikitux
