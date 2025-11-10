@@ -1,0 +1,90 @@
+## template: jinja
+#cloud-config
+
+users:
+  - name: kikitux
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+write_files:
+  # profile
+  - path: /home/kikitux/.bash_profile
+    owner: kikitux:kikitux
+    permissions: '0644'
+    append: false
+    content: |
+      export XDG_RUNTIME_DIR="/run/user/$UID"
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+
+  # minio service
+  - path: /home/kikitux/.config/systemd/user/minio-server.service
+    owner: kikitux:kikitux
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=MinIO Object Storage (Podman, rootless)
+      After=network.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=5s
+      
+      ExecStart=/usr/bin/podman run \
+        --rm \
+        --name minio-server \
+        -p 9000:9000 \
+        -p 9001:9001 \
+        -e MINIO_ROOT_USER=admin \
+        -e MINIO_ROOT_PASSWORD=admin123 \
+        -v /mnt/minio/cold1:/cold1:Z \
+        -v /mnt/minio/cold2:/cold2:Z \
+        -v /mnt/minio/cold3:/cold3:Z \
+        -v /mnt/minio/cold4:/cold4:Z \
+        docker.io/minio/minio server \
+          --address :9000 --console-address :9001 \
+          /cold1 /cold2 /cold3 /cold4 
+      
+      ExecStop=/usr/bin/podman stop -t 10 minio-server
+      ExecStopPost=/usr/bin/podman rm -f minio-server
+      
+      [Install]
+      WantedBy=default.target
+
+runcmd:
+  # ---- ROOT TASKS ----
+  # Run mkfs_all.sh as root
+  - bash /root/mkfs_all.sh
+
+  # minio
+  {% for mnt in ds.meta_data.mnt_minio %}
+  # check all is good
+  - echo {{ mnt }}
+  - echo {{ ds.meta_data.dev_minio[loop.index0] }}
+
+  # Create mount point
+  - mkdir -p {{ mnt }}
+
+  # Mount /dev into /mnt
+  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
+
+  # Add entries to /etc/fstab
+  - |
+    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+  {% endfor %}
+
+  # Ensure /mnt ownership & SELinux context
+  - sudo chown -R kikitux:kikitux /mnt/minio
+  - sudo chcon -Rt container_file_t /mnt/minio
+
+  # Enable linger for user services (so they start at boot)
+  - loginctl enable-linger kikitux
+
+  # ---- USER TASKS ----
+  # Reload and start systemd user service
+  - su -c 'systemctl --user daemon-reload' - kikitux
+  - su -c 'systemctl --user enable --now minio-server' - kikitux
+
+final_message: "Disk setup and minio-server deployed successfully for user kikitux."
