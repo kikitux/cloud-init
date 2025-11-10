@@ -8,6 +8,6 @@ users:
 runcmd:
   # ---- ROOT TASKS ----
   # Run mkfs_all.sh as root
-  - /root/mkfs_all.sh
+  - bash /root/mkfs_all.sh
 
 final_message: "User kikitux and disk setup deployed successfully."
