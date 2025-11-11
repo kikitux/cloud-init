@@ -3,4 +3,4 @@ local-hostname: vm-hot
 dev_rest_server: /dev/vdb
 mnt_rest_server: /mnt/rest-server
 dev_minio: [ "/dev/nvme0n1", "/dev/nvme0n2", "/dev/nvme0n3", "/dev/nvme0n4", "/dev/nvme0n5", "/dev/nvme0n6", "/dev/nvme0n7", "/dev/nvme0n8", "/dev/nvme0n9" ]
-mnt_minio: [ "/mnt/hot1", "/mnt/hot2", "/mnt/hot3", "/mnt/hot4", "/mnt/hot5", "/mnt/hot6", "/mnt/hot7", "/mnt/hot8", "/mnt/hot9" ]
+mnt_minio: [ "/mnt/minio/hot1", "/mnt/minio/hot2", "/mnt/minio/hot3", "/mnt/minio/hot4", "/mnt/minio/hot5", "/mnt/minio/hot6", "/mnt/minio/hot7", "/mnt/minio/hot8", "/mnt/minio/hot9" ]
