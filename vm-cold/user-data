@@ -85,6 +85,7 @@ runcmd:
   # ---- USER TASKS ----
   # Reload and start systemd user service
   - su -c 'systemctl --user daemon-reload' - kikitux
-  - su -c 'systemctl --user enable --now minio-server' - kikitux
+  - su -c 'systemctl --user enable minio-server' - kikitux
+  - su -c 'systemctl --user start minio-server' - kikitux
 
 final_message: "Disk setup and minio-server deployed successfully for user kikitux."
