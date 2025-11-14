@@ -59,25 +59,31 @@ runcmd:
   - bash /root/mkfs_all.sh
 
   # minio
-  {% for mnt in ds.meta_data.mnt_minio %}
+  {% for mnt in ds.meta_data.mnt_cold %}
   # check all is good
   - echo {{ mnt }}
-  - echo {{ ds.meta_data.dev_minio[loop.index0] }}
+  - echo {{ ds.meta_data.dev_cold[loop.index0] }}
 
   # Create mount point
   - mkdir -p {{ mnt }}
 
   # Mount /dev into /mnt
   - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
+  - mkdir -p ds.meta_data.svc_minio[loop.index0]
 
   # Add entries to /etc/fstab
   - |
     grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+
+  # Ensure mnt ownership & SELinux context
+  - sudo chown -R kikitux:kikitux {{ mnt }}
+  - sudo chcon -Rt container_file_t {{ mnt }}
+
   {% endfor %}
 
   # Ensure /mnt ownership & SELinux context
-  - sudo chown -R kikitux:kikitux /mnt/minio
-  - sudo chcon -Rt container_file_t /mnt/minio
+  - sudo chown -R kikitux:kikitux /mnt
+  - sudo chcon -Rt container_file_t /mnt
 
   # Enable linger for user services (so they start at boot)
   - loginctl enable-linger kikitux
