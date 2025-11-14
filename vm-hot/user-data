@@ -37,7 +37,7 @@ write_files:
           --name rest_server \
           -e "OPTIONS=--no-auth --private-repos" \
           -p 8000:8000 \
-          -v {{ ds.meta_data.mnt_rest_server }}/rest-server:/data:Z \
+          -v {{ ds.meta_data.svc_rest_server }}:/data:Z \
           docker.io/restic/rest-server
 
       ExecStop=/usr/bin/podman stop -t 10 rest_server
@@ -100,8 +100,7 @@ runcmd:
 
   # Mount /dev into /mnt
   - mountpoint {{ ds.meta_data.mnt_rest_server }} || mount {{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }}
-  - mkdir -p {{ ds.meta_data.mnt_rest_server }}/rest-server
-
+  - mkdir -p {{ ds.meta_data.svc_rest_server }}
 
   # Add entries to /etc/fstab
   - |
@@ -122,16 +121,20 @@ runcmd:
 
   # Mount /dev into /mnt
   - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
-  - mkdir -p {{ mnt }}/minio
+  - mkdir -p {{ ds.meta_data.svc_minio[loop.index0] }}
 
   # Add entries to /etc/fstab
   - |
     grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+
+  # Ensure /mnt/rest-server ownership & SELinux context
+  - chown -R kikitux:kikitux {{ mnt }}
+  - chcon -Rt container_file_t {{ mnt }}
   {% endfor %}
 
   # Ensure /mnt ownership & SELinux context
-  - sudo chown -R kikitux:kikitux /mnt/minio
-  - sudo chcon -Rt container_file_t /mnt/minio
+  - sudo chown -R kikitux:kikitux /mnt/
+  - sudo chcon -Rt container_file_t /mnt/
 
   # Enable linger for user services (so they start at boot)
   - loginctl enable-linger kikitux
