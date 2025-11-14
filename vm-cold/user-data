@@ -68,12 +68,12 @@ runcmd:
   - mkdir -p {{ mnt }}
 
   # Mount /dev into /mnt
-  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
+  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_cold[loop.index0] }} {{ mnt }}
   - mkdir -p ds.meta_data.svc_minio[loop.index0]
 
   # Add entries to /etc/fstab
   - |
-    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_cold[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
 
   # Ensure mnt ownership & SELinux context
   - sudo chown -R kikitux:kikitux {{ mnt }}
