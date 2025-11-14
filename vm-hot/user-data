@@ -125,7 +125,7 @@ runcmd:
 
   # Add entries to /etc/fstab
   - |
-    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
+    grep -q '{{ mnt }}' /etc/fstab || echo '{{ ds.meta_data.dev_hot[loop.index0] }} {{ mnt}} xfs defaults 0 0' >> /etc/fstab
 
   # Ensure /mnt/rest-server ownership & SELinux context
   - chown -R kikitux:kikitux {{ mnt }}
