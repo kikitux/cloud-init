@@ -107,8 +107,8 @@ runcmd:
     grep -q '{{ ds.meta_data.mnt_big }}' /etc/fstab || echo '{{ ds.meta_data.dev_big }} {{ ds.meta_data.mnt_big }} xfs defaults 0 0' >> /etc/fstab
 
   # Ensure /mnt/rest-server ownership & SELinux context
-  - chown -R kikitux:kikitux {{ ds.meta_data.mnt_rest_server }}
-  - chcon -Rt container_file_t {{ ds.meta_data.mnt_rest_server }}
+  - chown -R kikitux:kikitux {{ ds.meta_data.mnt_big }}
+  - chcon -Rt container_file_t {{ ds.meta_data.mnt_big }}
 
   # minio
   {% for mnt in ds.meta_data.mnt_hot %}
