@@ -68,7 +68,7 @@ write_files:
         -p 9001:9001 \
         -e MINIO_ROOT_USER=admin \
         -e MINIO_ROOT_PASSWORD=admin123 \
-        -v /mnt/hot1/minio:/hot1:Z \
+        -v {{ ds.meta_data.svc_minio[0] }} :/hot1:Z \
         -v /mnt/hot2/minio:/hot2:Z \
         -v /mnt/hot3/minio:/hot3:Z \
         -v /mnt/hot4/minio:/hot4:Z \
