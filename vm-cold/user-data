@@ -39,10 +39,10 @@ write_files:
         -p 9001:9001 \
         -e MINIO_ROOT_USER=admin \
         -e MINIO_ROOT_PASSWORD=admin123 \
-        -v /mnt/minio/cold1:/cold1:Z \
-        -v /mnt/minio/cold2:/cold2:Z \
-        -v /mnt/minio/cold3:/cold3:Z \
-        -v /mnt/minio/cold4:/cold4:Z \
+        -v {{ ds.meta_data.svc_minio[0] }}:/cold1:Z \
+        -v {{ ds.meta_data.svc_minio[1] }}:Z \
+        -v {{ ds.meta_data.svc_minio[2] }}:Z \
+        -v {{ ds.meta_data.svc_minio[3] }}:Z \
         docker.io/minio/minio server \
           --address :9000 --console-address :9001 \
           /cold1 /cold2 /cold3 /cold4 
