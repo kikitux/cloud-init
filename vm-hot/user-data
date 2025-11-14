@@ -68,15 +68,15 @@ write_files:
         -p 9001:9001 \
         -e MINIO_ROOT_USER=admin \
         -e MINIO_ROOT_PASSWORD=admin123 \
-        -v {{ ds.meta_data.svc_minio[0] }} :/hot1:Z \
-        -v /mnt/hot2/minio:/hot2:Z \
-        -v /mnt/hot3/minio:/hot3:Z \
-        -v /mnt/hot4/minio:/hot4:Z \
-        -v /mnt/hot5/minio:/hot5:Z \
-        -v /mnt/hot6/minio:/hot6:Z \
-        -v /mnt/hot7/minio:/hot7:Z \
-        -v /mnt/hot8/minio:/hot8:Z \
-        -v /mnt/hot9/minio:/hot9:Z \
+        -v {{ ds.meta_data.svc_minio[0] }}:/hot1:Z \
+        -v {{ ds.meta_data.svc_minio[1] }}:/hot2:Z \
+        -v {{ ds.meta_data.svc_minio[2] }}:/hot3:Z \
+        -v {{ ds.meta_data.svc_minio[3] }}:/hot4:Z \
+        -v {{ ds.meta_data.svc_minio[4] }}:/hot5:Z \
+        -v {{ ds.meta_data.svc_minio[5] }}:/hot6:Z \
+        -v {{ ds.meta_data.svc_minio[6] }}:/hot7:Z \
+        -v {{ ds.meta_data.svc_minio[7] }}:/hot8:Z \
+        -v {{ ds.meta_data.svc_minio[8] }}:/hot9:Z \
         docker.io/minio/minio server \
           --address :9000 --console-address :9001 \
           /hot1 /hot2 /hot3 /hot4 \
@@ -96,31 +96,31 @@ runcmd:
 
   # rest-server
   # Create mount point
-  - mkdir -p {{ ds.meta_data.mnt_rest_server }}
+  - mkdir -p {{ ds.meta_data.mnt_big }}
 
   # Mount /dev into /mnt
-  - mountpoint {{ ds.meta_data.mnt_rest_server }} || mount {{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }}
+  - mountpoint {{ ds.meta_data.mnt_big }} || mount {{ ds.meta_data.dev_big }} {{ ds.meta_data.mnt_big }}
   - mkdir -p {{ ds.meta_data.svc_rest_server }}
 
   # Add entries to /etc/fstab
   - |
-    grep -q '{{ ds.meta_data.mnt_rest_server }}' /etc/fstab || echo '{{ ds.meta_data.dev_rest_server }} {{ ds.meta_data.mnt_rest_server }} xfs defaults 0 0' >> /etc/fstab
+    grep -q '{{ ds.meta_data.mnt_big }}' /etc/fstab || echo '{{ ds.meta_data.dev_big }} {{ ds.meta_data.mnt_big }} xfs defaults 0 0' >> /etc/fstab
 
   # Ensure /mnt/rest-server ownership & SELinux context
   - chown -R kikitux:kikitux {{ ds.meta_data.mnt_rest_server }}
   - chcon -Rt container_file_t {{ ds.meta_data.mnt_rest_server }}
 
   # minio
-  {% for mnt in ds.meta_data.mnt_minio %}
+  {% for mnt in ds.meta_data.mnt_hot %}
   # check all is good
   - echo {{ mnt }}
-  - echo {{ ds.meta_data.dev_minio[loop.index0] }}
+  - echo {{ ds.meta_data.dev_hot[loop.index0] }}
 
   # Create mount point
   - mkdir -p {{ mnt }}
 
   # Mount /dev into /mnt
-  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_minio[loop.index0] }} {{ mnt }}
+  - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_hot[loop.index0] }} {{ mnt }}
   - mkdir -p {{ ds.meta_data.svc_minio[loop.index0] }}
 
   # Add entries to /etc/fstab
