@@ -69,7 +69,7 @@ runcmd:
 
   # Mount /dev into /mnt
   - mountpoint {{ mnt }} || mount {{ ds.meta_data.dev_cold[loop.index0] }} {{ mnt }}
-  - mkdir -p ds.meta_data.svc_minio[loop.index0]
+  - mkdir -p {{ ds.meta_data.svc_minio[loop.index0] }}
 
   # Add entries to /etc/fstab
   - |
