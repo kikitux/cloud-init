@@ -1,0 +1,84 @@
+## template: jinja
+#cloud-config
+
+users:
+  - name: kikitux
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+
+write_files:
+  # profile
+  - path: /home/kikitux/.bash_profile
+    owner: kikitux:kikitux
+    permissions: '0644'
+    append: false
+    content: |
+      export XDG_RUNTIME_DIR="/run/user/$UID"
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+      export PATH="$PATH:/home/kikitux/.local/bin"
+
+  # rest-server service
+  - path: /home/kikitux/.config/systemd/user/rest-server.service
+    owner: kikitux:kikitux
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Restic rest-server (Podman, rootless)
+      After=network.target
+      Wants=network-online.target
+
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=5s
+
+      ExecStart=/usr/bin/podman run \
+          --rm \
+          --name rest_server \
+          -e "OPTIONS=--no-auth --private-repos" \
+          -p 8000:8000 \
+          -v {{ ds.meta_data.svc_rest_server }}:/data:Z \
+          docker.io/restic/rest-server
+
+      ExecStop=/usr/bin/podman stop -t 10 rest_server
+      ExecStopPost=/usr/bin/podman rm -f rest_server
+
+      [Install]
+      WantedBy=default.target
+
+
+runcmd:
+  # ---- ROOT TASKS ----
+  # Run mkfs_all.sh as root
+  - bash /root/mkfs_all.sh
+
+  # rest-server
+  # Create mount point
+  - mkdir -p {{ ds.meta_data.mnt_big }}
+
+  # Mount /dev into /mnt
+  - mountpoint {{ ds.meta_data.mnt_big }} || mount {{ ds.meta_data.dev_big }} {{ ds.meta_data.mnt_big }}
+  - mkdir -p {{ ds.meta_data.svc_rest_server }}
+
+  # Add entries to /etc/fstab
+  - |
+    grep -q '{{ ds.meta_data.mnt_big }}' /etc/fstab || echo '{{ ds.meta_data.dev_big }} {{ ds.meta_data.mnt_big }} xfs defaults 0 0' >> /etc/fstab
+
+  # Ensure /mnt/rest-server ownership & SELinux context
+  - chown -R kikitux:kikitux {{ ds.meta_data.mnt_big }}
+  - chcon -Rt container_file_t {{ ds.meta_data.mnt_big }}
+
+  # Ensure /mnt ownership & SELinux context
+  - sudo chown -R kikitux:kikitux /mnt/
+  - sudo chcon -Rt container_file_t /mnt/
+
+  # Enable linger for user services (so they start at boot)
+  - loginctl enable-linger kikitux
+
+  # ---- USER TASKS ----
+  # Reload and start systemd user service
+  - su -c 'systemctl --user daemon-reload' - kikitux
+  - su -c 'systemctl --user enable --now rest-server' - kikitux
+
+final_message: "Disk setup, rest-server and minio-server deployed successfully for user kikitux."
