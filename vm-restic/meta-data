@@ -1,0 +1,5 @@
+instance-id: vm-restic
+local-hostname: vm-restic
+dev_big: /dev/vdb
+mnt_big: /mnt/big
+svc_rest_server: /mnt/big/rest-server
