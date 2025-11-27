@@ -1,6 +1,6 @@
 instance-id: vm-cold
 local-hostname: vm-cold
-dev_cold: [ "/dev/vdb", "/dev/vdc", "/dev/vdd", "/dev/vde" ]
+dev_cold: [ "/dev/nvme0n1", "/dev/nvme0n2", "/dev/nvme0n3", "/dev/nvme0n4" ]
 mnt_cold: [ "/mnt/cold1", "/mnt/cold2", "/mnt/cold3", "/mnt/cold4" ]
 
 svc_minio: [ "/mnt/cold1/minio", "/mnt/cold2/minio", "/mnt/cold3/minio", "/mnt/cold4/minio" ]
