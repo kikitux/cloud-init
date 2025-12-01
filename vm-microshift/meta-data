@@ -1,0 +1,3 @@
+instance-id: vm-microshift
+local-hostname: vm-microshift
+dev_myvg1: /dev/nvme0n1
