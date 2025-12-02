@@ -126,15 +126,13 @@ write_files:
       fi
       
       # Create a link to the default kubeconfig.
-      # Note that the /root directory may be a symlink to /var/roothome and the target
-      # directory may not exist, depending on the operating system.
-      if [ ! -f /root/.kube/config ] ; then
-          mkdir -p "$(readlink -f /root)/.kube"
-          ln -s /var/lib/microshift/resources/kubeadmin/kubeconfig /root/.kube/config
-      fi
+      [ -d /root/.kube ] && rm -fr /root/.kube/
+      mkdir -p "$(readlink -f /root)/.kube"
+      ln -s /var/lib/microshift/resources/kubeadmin/kubeconfig /root/.kube/config
       
       # Enable the MicroShift service
       systemctl enable microshift
+      systemctl start microshift
 
 runcmd:
   # ---- ROOT TASKS ----
