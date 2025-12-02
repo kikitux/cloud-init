@@ -146,7 +146,7 @@ runcmd:
   - tar -C /root/microshift/ -zxvf /tmp/microshift-rpms-x86_64.tgz
   - ls -al /etc/yum.repos.d/
   - dnf clean all
-  - dnf makecache
+  - dnf makecache --disablerepo='*' --enablerepo='microshift-io'
   - dnf install -y https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.rpm
   - dnf install -y openshift-clients cri-tools cri-o microshift-greenboot microshift-selinux microshift microshift-networking microshift-release-info microshift-kindnet-release-info microshift-kindnet microshift-topolvm-release-info microshift-topolvm 
   - systemctl daemon-reload
