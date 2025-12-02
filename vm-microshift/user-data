@@ -17,11 +17,56 @@ write_files:
       export XDG_RUNTIME_DIR="/run/user/$UID"
       export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
       export PATH="$PATH:/home/kikitux/.local/bin"
+  # microshift-ip.repo
+  - path: /etc/yum.repos.d/microshift-io.repo
+    owner: root:root
+    permissions: '0644'
+    append: false
+    content: |
+      [microshift-io]
+      name=Microshift-io
+      baseurl=file:///root/microshift/
+      repo_gpgcheck=0
+      gpgcheck=0
+      gpgkey=
+      enabled=1
+      sslverify=1
+      priority=50
+      
+      [openshift-dependencies]
+      name=openshift-dependencies
+      baseurl=https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.20-el9-beta/
+      repo_gpgcheck=0
+      gpgcheck=0
+      gpgkey=
+      enabled=1
+      sslverify=1
+      priority=50
 
 runcmd:
   # ---- ROOT TASKS ----
   - pvcreate -f {{ ds.meta_data.dev_myvg1 }}
   - vgcreate myvg1 {{ ds.meta_data.dev_myvg1 }}
   - sudo dnf install -y https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.rpm
+  - wget wget https://github.com/microshift-io/microshift/releases/latest/download/microshift-rpms-x86_64.tgz
+  - mkdir -p microshift
+  - tar -C microshift/ -zxvf microshift-rpms-x86_64.tgz
+  - sudo dnf install -y \
+      openshift-clients \
+      cri-tools \
+      cri-o \
+      microshift-greenboot \
+      microshift-selinux \
+      microshift \
+      microshift-networking \
+      microshift-release-info \
+      microshift-kindnet-release-info \
+      microshift-kindnet \
+      microshift-topolvm-release-info \
+      microshift-topolvm 
+
+
+sudo systemctl daemon-reload
+
 
 final_message: "Disk setup, myvg1."
