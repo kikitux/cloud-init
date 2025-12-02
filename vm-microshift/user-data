@@ -53,7 +53,6 @@ write_files:
       dns:
           baseDomain: {{ ds.meta_data.base_domain }}
 
-write_files:
   # postinstall.sh
   - path: /root/postinstall.sh
     owner: root:root
