@@ -17,6 +17,7 @@ write_files:
       export XDG_RUNTIME_DIR="/run/user/$UID"
       export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
       export PATH="$PATH:/home/kikitux/.local/bin"
+
   # microshift-io.repo
   - path: /etc/yum.repos.d/microshift-io.repo
     owner: root:root
@@ -42,8 +43,18 @@ write_files:
       enabled=1
       sslverify=1
       priority=50
+
+  # config.yaml
+  - path: /etc/microshift/config.yaml
+    owner: root:root
+    permissions: '0644'
+    append: false
+    content: |
+      dns:
+          baseDomain: {{ ds.meta_data.name }}.kikitux.net
+
 write_files:
-  # profile
+  # postinstall.sh
   - path: /root/postinstall.sh
     owner: root:root
     permissions: '0644'
@@ -125,7 +136,6 @@ write_files:
       
       # Enable the MicroShift service
       systemctl enable microshift
-
 
 runcmd:
   # ---- ROOT TASKS ----
