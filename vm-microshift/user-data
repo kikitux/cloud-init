@@ -51,7 +51,7 @@ write_files:
     append: false
     content: |
       dns:
-          baseDomain: {{ ds.meta_data.name }}.kikitux.net
+          baseDomain: {{ ds.meta_data.local-hostname }}.{{ ds.meta_data.local-domain }}
 
 write_files:
   # postinstall.sh
