@@ -51,7 +51,7 @@ write_files:
     append: false
     content: |
       dns:
-          baseDomain: {{ ds.meta_data.local-hostname }}.{{ ds.meta_data.local-domain }}
+          baseDomain: {{ ds.meta_data.base_domain }}
 
 write_files:
   # postinstall.sh
