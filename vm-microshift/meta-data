@@ -1,4 +1,4 @@
 instance-id: vm-microshift
 local-hostname: vm-microshift
-local-domain: kikitux.net
+base_domain: vm-microshift.kikitux.net
 dev_myvg1: /dev/nvme0n1
