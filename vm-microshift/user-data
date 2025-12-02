@@ -64,9 +64,6 @@ runcmd:
       microshift-kindnet \
       microshift-topolvm-release-info \
       microshift-topolvm 
-
-
-sudo systemctl daemon-reload
-
+  - sudo systemctl daemon-reload
 
 final_message: "Disk setup, myvg1."
