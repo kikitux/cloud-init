@@ -50,8 +50,10 @@ runcmd:
   - wget -P /tmp/ https://github.com/microshift-io/microshift/releases/latest/download/microshift-rpms-x86_64.tgz
   - mkdir -p /root/microshift
   - tar -C /root/microshift/ -zxvf /tmp/microshift-rpms-x86_64.tgz
+  - ls -al /etc/yum.repos.d/
   - dnf clean all
   - dnf makecache
+  - dnf repoquery --repoid=microshift-io
   - sudo dnf install -y https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.rpm
   - sudo dnf install -y \
       openshift-clients \
