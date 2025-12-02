@@ -47,9 +47,9 @@ runcmd:
   # ---- ROOT TASKS ----
   - pvcreate -f {{ ds.meta_data.dev_myvg1 }}
   - vgcreate myvg1 {{ ds.meta_data.dev_myvg1 }}
-  - wget https://github.com/microshift-io/microshift/releases/latest/download/microshift-rpms-x86_64.tgz
-  - mkdir -p microshift
-  - tar -C microshift/ -zxvf microshift-rpms-x86_64.tgz
+  - wget -P /tmp/microshift-rpms-x86_64.tgz https://github.com/microshift-io/microshift/releases/latest/download/microshift-rpms-x86_64.tgz
+  - mkdir -p /root/microshift
+  - tar -C /root/microshift/ -zxvf /tmp/microshift-rpms-x86_64.tgz
   - sudo dnf install -y https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.rpm
   - sudo dnf install -y \
       openshift-clients \
