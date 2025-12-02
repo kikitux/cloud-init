@@ -22,5 +22,6 @@ runcmd:
   # ---- ROOT TASKS ----
   - pvcreate -f {{ ds.meta_data.dev_myvg1 }}
   - vgcreate myvg1 {{ ds.meta_data.dev_myvg1 }}
+  - sudo dnf install -y https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.rpm
 
 final_message: "Disk setup, myvg1."
